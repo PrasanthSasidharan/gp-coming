@@ -19,31 +19,94 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow-x: hidden;
       font-family: 'Rajdhani', sans-serif;
       color: #fff;
       position: relative;
+      background: linear-gradient(135deg, #4a0020 0%, #800020 40%, #5c0024 100%);
     }
 
-    /* Full-screen background image */
-    .bg {
-      position: fixed;
-      inset: 0;
-      background: url('assets/Game_Front.png') center/80% no-repeat;
-      background-color: #000;
-      z-index: 0;
+    /* Slideshow carousel */
+    .slideshow-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      background: #1a0010;
     }
 
-    /* Dark overlay for readability */
-    .overlay {
-      position: fixed;
+    .slideshow {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+
+    .slideshow img {
+      position: absolute;
       inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0.55) 0%,
-        rgba(0, 0, 0, 0.75) 100%
-      );
-      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+
+    .slideshow img.active {
+      opacity: 1;
+    }
+
+    /* Slideshow navigation arrows */
+    .slide-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1.4rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    .slide-arrow:hover {
+      background: rgba(128, 0, 32, 0.7);
+    }
+
+    .slide-arrow.prev { left: 10px; }
+    .slide-arrow.next { right: 10px; }
+
+    /* Slideshow dots */
+    .slide-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 0;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .slide-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .slide-dots span.active {
+      background: #ff6b8a;
+      transform: scale(1.3);
     }
 
     /* Content */
@@ -52,7 +115,8 @@
       z-index: 2;
       text-align: center;
       padding: 2rem;
-      max-width: 720px;
+      max-width: 800px;
+      width: 100%;
       animation: fadeUp 1.2s ease-out both;
     }
 
@@ -76,13 +140,13 @@
       line-height: 1.1;
       text-transform: uppercase;
       letter-spacing: 4px;
-      text-shadow: 0 0 30px rgba(0, 170, 255, 0.4);
+      text-shadow: 0 0 30px rgba(255, 100, 150, 0.4);
       margin-bottom: 1rem;
     }
 
     h1 span {
       display: block;
-      background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+      background: linear-gradient(135deg, #ff6b8a, #ffd700);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -120,7 +184,7 @@
       font-size: 2.2rem;
       font-weight: 700;
       display: block;
-      background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+      background: linear-gradient(135deg, #ff6b8a, #ffd700);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -161,14 +225,14 @@
     }
 
     .notify-form input[type="email"]:focus {
-      border-color: #00d4ff;
+      border-color: #ff6b8a;
     }
 
     .notify-form button {
       padding: 0.75rem 1.6rem;
       border: none;
       border-radius: 8px;
-      background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+      background: linear-gradient(135deg, #ff6b8a, #ffd700);
       color: #fff;
       font-family: 'Orbitron', sans-serif;
       font-size: 0.85rem;
@@ -191,13 +255,13 @@
     }
 
     .contact a {
-      color: #00d4ff;
+      color: #ff6b8a;
       text-decoration: none;
       transition: color 0.3s;
     }
 
     .contact a:hover {
-      color: #7b2ff7;
+      color: #ffd700;
     }
 
     /* Animations */
@@ -225,7 +289,7 @@
       position: absolute;
       width: 3px;
       height: 3px;
-      background: rgba(0, 212, 255, 0.5);
+      background: rgba(255, 107, 138, 0.5);
       border-radius: 50%;
       animation: float linear infinite;
     }
@@ -239,9 +303,6 @@
   </style>
 </head>
 <body>
-  <div class="bg"></div>
-  <div class="overlay"></div>
-
   <!-- Floating particles -->
   <div class="particles" id="particles"></div>
 
@@ -250,17 +311,31 @@
     <h1><span>Coming Soon</span></h1>
     <p class="tagline">We're working hard to bring you something amazing.<br />Stay tuned for the big reveal!</p>
 
+    <!-- Slideshow carousel -->
+    <div class="slideshow-wrapper">
+      <div class="slideshow" id="slideshow">
+        <img src="assets/Game_Front.png" class="active" alt="Slide" />
+        <img src="assets/1.png" alt="Slide" />
+        <img src="assets/2.png" alt="Slide" />
+        <img src="assets/3.png" alt="Slide" />
+        <img src="assets/4.png" alt="Slide" />
+      </div>
+
+      <div class="slide-dots" id="slideDots">
+        <span class="active" onclick="goToSlide(0)"></span>
+        <span onclick="goToSlide(1)"></span>
+        <span onclick="goToSlide(2)"></span>
+        <span onclick="goToSlide(3)"></span>
+        <span onclick="goToSlide(4)"></span>
+      </div>
+    </div>
+
     <div class="countdown" id="countdown">
       <div class="box"><span class="num" id="days">00</span><span class="label">Days</span></div>
       <div class="box"><span class="num" id="hours">00</span><span class="label">Hours</span></div>
       <div class="box"><span class="num" id="minutes">00</span><span class="label">Minutes</span></div>
       <div class="box"><span class="num" id="seconds">00</span><span class="label">Seconds</span></div>
     </div>
-
-    <!-- <form class="notify-form" onsubmit="handleNotify(event)">
-      <input type="email" placeholder="Enter your email" required />
-      <button type="submit">Notify Me</button>
-    </form> -->
 
     <p class="contact">Questions? Reach us at <a href="mailto:gulan-perish@outlook.com">gulan-perish@outlook.com</a></p>
   </div>
@@ -295,13 +370,36 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // --- Notify button ---
-    function handleNotify(e) {
-      e.preventDefault();
-      const input = e.target.querySelector('input');
-      alert('Thanks! We\'ll notify ' + input.value + ' when we launch.');
-      input.value = '';
+    // --- Slideshow ---
+    const slides = document.querySelectorAll('#slideshow img');
+    const dots = document.querySelectorAll('#slideDots span');
+    let currentSlide = 0;
+    let autoTimer;
+
+    function showSlide(index) {
+      slides[currentSlide].classList.remove('active');
+      dots[currentSlide].classList.remove('active');
+      currentSlide = (index + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
     }
+
+    function changeSlide(dir) {
+      showSlide(currentSlide + dir);
+      resetAutoPlay();
+    }
+
+    function goToSlide(index) {
+      showSlide(index);
+      resetAutoPlay();
+    }
+
+    function resetAutoPlay() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => showSlide(currentSlide + 1), 4000);
+    }
+
+    resetAutoPlay();
 
     // --- Floating particles ---
     (function createParticles() {
